@@ -14,8 +14,8 @@ export default function LogIn() {
     }, 800);
   };
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-white w-[400px] h-[650px] rounded-[10px]">
+    <div className="flex items-center justify-center h-screen overflow-x-hidden overscroll-none">
+      <div className="bg-white w-[400px] h-[650px] rounded-lg">
         <div className="">
           <img src={Logo} alt="Logo" />
         </div>

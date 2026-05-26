@@ -12,8 +12,8 @@ const btnStyles = {
 
 const Suppliers = () => {
   return (
-    <div className="p-6">
-      <div className="pt-4">
+    <div className="p-6 ">
+      <div className="pt-4 ">
         <h1 className="text-xl font-semibold">Suppliers</h1>
         <p className="text-[#64748B] my-2">Manage your supplier relationship</p>
       </div>
@@ -59,7 +59,7 @@ const Suppliers = () => {
               </span>
             </div>
 
-            <div className="flex gap-3 mt-2">
+            <div className="flex gap-3 mt-2 ">
               {item.actions.map((action, i) => (
                 <button key={i} className={btnStyles[action.type]}>
                   {action.label}
@@ -69,13 +69,13 @@ const Suppliers = () => {
           </div>
         ))}
       </div>
-      <div className="bg-[#3B82F614] border border-[#3B82F6] mt-8 rounded-2xl">
+      <div className="bg-[#3B82F614] border border-[#3B82F6] mt-8 rounded-2xl ">
         <div className="flex flex-col justify-center items-center py-16">
           <h1 className="font-bold text-2xl">Add New Supplier</h1>
           <p className="text-[#64748B] py-1 px-5">
             Expand your supplier network to improve stock availability
           </p>
-          <button className="bg-[#4F46E5] text-white px-8 py-4 mt-5 md:w-[22em] w-[18em] rounded-2xl cursor-pointer">
+          <button className="bg-[#4F46E5]  text-white px-8 py-4 mt-5 md:w-[22em] w-[18em] rounded-2xl cursor-pointer">
             Add Supplier
           </button>
         </div>

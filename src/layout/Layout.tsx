@@ -6,7 +6,7 @@ export default function Layout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex">
+    <div className="flex overflow-x-hidden">
       <SideBar open={open} setOpen={setOpen} />
 
       {open && (
