@@ -2,6 +2,7 @@ import AppRoutes from "./routes/AppRoutes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
+
 function App() {
   return (
     <div className="bg-[#EEF2FF] min-h-screen">

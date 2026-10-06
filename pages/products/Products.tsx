@@ -1,120 +1,16 @@
 import { useState } from "react";
-
-type Status = "healthy" | "low" | "critical";
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  status: Status;
-  currentStock: number;
-  minStock: number;
-  maxStock: number;
-  price: number;
-  category: string;
-}
-
-const products: Product[] = [
-  {
-    id: "1",
-    sku: "WBH-001",
-    name: "Wireless Bluetooth Headphones",
-    status: "healthy",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 79.99,
-    category: "Electronics",
-  },
-  {
-    id: "2",
-    sku: "OCT-6651",
-    name: "Organic Cotton T-shirt",
-    status: "critical",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 74.99,
-    category: "Clothing",
-  },
-  {
-    id: "3",
-    sku: "SSW-021",
-    name: "Stainless Steal Water Bottle",
-    status: "low",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 70.99,
-    category: "Electronics",
-  },
-  {
-    id: "4",
-    sku: "OCT-6651",
-    name: "Organic Cotton T-shirt",
-    status: "critical",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 74.99,
-    category: "Clothing",
-  },
-  {
-    id: "5",
-    sku: "WBH-001",
-    name: "Wireless Bluetooth Headphones",
-    status: "healthy",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 79.99,
-    category: "Electronics",
-  },
-  {
-    id: "6",
-    sku: "WSW-001",
-    name: "Stainless Steal Water Bottle",
-    status: "low",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 70.99,
-    category: "Electronics",
-  },
-  {
-    id: "7",
-    sku: "WBH-001",
-    name: "Wireless Bluetooth Headphones",
-    status: "healthy",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 79.99,
-    category: "Electronics",
-  },
-  {
-    id: "8",
-    sku: "WSW-001",
-    name: "Stainless Steal Water Bottle",
-    status: "low",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 70.99,
-    category: "Electronics",
-  },
-  {
-    id: "9",
-    sku: "OCT-6651",
-    name: "Organic Cotton T-shirt",
-    status: "critical",
-    currentStock: 45,
-    minStock: 20,
-    maxStock: 100,
-    price: 74.99,
-    category: "Clothing",
-  },
-];
+import { toast } from "react-toastify";
+import { GrCircleAlert } from "react-icons/gr";
+import { IoAlert } from "react-icons/io5";
+import {
+  useProducts,
+  useDeleteProduct,
+  type Product,
+  type Status,
+} from "../../src/hooks/useProducts";
+import { useDebounce } from "../../src/hooks/useDebounce";
+import AddProductModal from "./AddProductModal";
+import ConfirmModal from "./ConfirmModal";
 
 const statusConfig: Record<
   Status,
@@ -128,21 +24,21 @@ const statusConfig: Record<
 > = {
   healthy: {
     label: "Healthy",
-    badgeClass: "bg-green-100 text-green-700",
+    badgeClass: "bg-[#22C55E24] text-[#22C55E] border border-[#22C55E]",
     barClass: "bg-green-500",
-    btnClass: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50",
+    btnClass: "bg-[#EEF2FF] border border-[#E5E7EB] text-gray-700",
     btnLabel: "Reorder",
   },
   low: {
     label: "Low",
-    badgeClass: "bg-yellow-100 text-yellow-700",
+    badgeClass: "bg-[#F59E0B24] text-[#F59E0B] border border-[#F59E0B]",
     barClass: "bg-yellow-400",
-    btnClass: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50",
+    btnClass: "bg-[#EEF2FF] border border-[#E5E7EB] text-gray-700",
     btnLabel: "Reorder",
   },
   critical: {
     label: "Critical",
-    badgeClass: "bg-red-100 text-red-600",
+    badgeClass: "bg-[#EF444424] text-[#EF4444] border border-[#EF4444]",
     barClass: "bg-red-500",
     btnClass: "bg-indigo-600 text-white hover:bg-indigo-700",
     btnLabel: "Reorder Now",
@@ -154,28 +50,67 @@ const allCategories = ["All Categories", "Electronics", "Clothing"];
 
 export default function Products() {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search);
   const [selectedStatus, setSelectedStatus] = useState("All Status");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+
+  const { data: products = [], isLoading, error } = useProducts(debouncedSearch);
+  const deleteProduct = useDeleteProduct();
+
+  const confirmDelete = () => {
+    if (!toDelete) return;
+
+    deleteProduct.mutate(toDelete.id, {
+      onSuccess: () => toast.success("Product deleted"),
+      onError: (err) => toast.error(`Delete failed: ${err.message}`),
+    });
+    setToDelete(null);
+  };
 
   const filtered = products.filter((p) => {
-    const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.sku.toLowerCase().includes(search.toLowerCase());
     const matchStatus =
       selectedStatus === "All Status" ||
       p.status === selectedStatus.toLowerCase();
     const matchCategory =
       selectedCategory === "All Categories" || p.category === selectedCategory;
-    return matchSearch && matchStatus && matchCategory;
+    return matchStatus && matchCategory;
   });
 
+  if (isLoading) {
+    return (
+      <p className="text-center text-gray-400 mt-10">Loading products...</p>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-center text-red-500 mt-10">
+        Failed to load products: {error.message}
+      </p>
+    );
+  }
+
   return (
-    <div className="px-4">
-      <div className="pt-10 px-4 ">
-        <h1 className="text-xl font-semibold">Products</h1>
-        <p className="text-[#64748B] mt-4">Manage your inventory items</p>
+    <div className="">
+      <div className="mt-8 mx-10 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Products</h1>
+          <p className="text-[#64748B] mt-4 mb-6">Manage your inventory items</p>
+        </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="bg-[#4F46E5] text-white rounded-xl px-5 py-2 font-medium cursor-pointer hover:bg-[#3731a7] duration-150 ease-in-out"
+        >
+          Add Product
+        </button>
       </div>
-      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 md:p-6 rounded-xl my-6">
+
+      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 md:p-6 rounded-xl my-6 mx-10">
         <input
           type="text"
           placeholder="Search by name or SKU..."
@@ -187,7 +122,7 @@ export default function Products() {
         <select
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-8 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="px-8  py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
         >
           {allStatuses.map((s) => (
             <option key={s}>{s}</option>
@@ -204,7 +139,8 @@ export default function Products() {
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-10">
         {filtered.map((product) => {
           const cfg = statusConfig[product.status];
           const capacityPct = Math.round(
@@ -223,11 +159,12 @@ export default function Products() {
                       {product.name}
                     </p>
                     <span
-                      className={`text-xs px-2 py-1 rounded-lg font-medium ${cfg.badgeClass}`}
+                      className={`text-xs flex items-center px-2 py-1 rounded-full font-medium ${cfg.badgeClass}`}
                     >
+                      {product.status === "low" && <IoAlert />}
                       {cfg.label}
                       {product.status === "critical" && (
-                        <span className="ml-1"></span>
+                        <GrCircleAlert className="ml-2 text-lg" />
                       )}
                     </span>
                   </div>
@@ -271,6 +208,21 @@ export default function Products() {
               >
                 {cfg.btnLabel}
               </button>
+              <button
+                onClick={() => setEditing(product)}
+                className="w-full cursor-pointer py-2 rounded-lg text-sm font-medium border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 duration-150 ease-in-out"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() =>
+                  setToDelete({ id: product.id, name: product.name })
+                }
+                disabled={deleteProduct.isPending}
+                className="w-full cursor-pointer py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50 duration-150 ease-in-out disabled:opacity-50"
+              >
+                Delete
+              </button>
             </div>
           );
         })}
@@ -281,6 +233,26 @@ export default function Products() {
           No products found.
         </p>
       )}
+
+      <AddProductModal
+        key={editing?.id ?? (showAdd ? "add" : "closed")}
+        open={showAdd || editing !== null}
+        product={editing ?? undefined}
+        onClose={() => {
+          setShowAdd(false);
+          setEditing(null);
+        }}
+      />
+
+      <ConfirmModal
+        open={toDelete !== null}
+        title="Delete product"
+        message={`Are you sure you want to delete "${toDelete?.name}"? This can't be undone.`}
+        confirmLabel="Delete"
+        loading={deleteProduct.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setToDelete(null)}
+      />
     </div>
   );
 }

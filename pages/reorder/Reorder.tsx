@@ -3,17 +3,17 @@ import { BsBoxSeam } from "react-icons/bs";
 const Reorder = () => {
   return (
     <div>
-      <div className="pt-10 pl-10">
+      <div className="mx-10 mt-8">
         <h1 className="text-xl font-semibold">Create Reorder</h1>
-        <p className="text-[#64748B] my-4">
+        <p className="text-[#64748B] mt-4 mb-6">
           User smart suggestions or customize your order
         </p>
       </div>
-      <div className="main grid lg:grid-cols-3 gap-4">
+      <div className="main grid lg:grid-cols-3 gap-6 mx-10">
         <div className="left bg-white pl-4 py-4 lg:col-span-2 rounded-xl">
-          <div className="flex flex-col px-4">
-            <h1 className="text-gray-700 font-semibold">Order Details</h1>
-            <div className="py-5 mt-4">
+          <div className="flex flex-col">
+            <h1 className="text-gray-700 p-6 font-semibold">Order Details</h1>
+            <div className="mx-6">
               <p className="text-gray-700">Select Product</p>
               <button className="w-full mt-2 flex items-center justify-between px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg bg-white hover:border-gray-300">
                 <span className="text-gray-400">Choose a product</span>

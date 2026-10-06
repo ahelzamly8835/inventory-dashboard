@@ -12,13 +12,13 @@ const btnStyles = {
 
 const Suppliers = () => {
   return (
-    <div className="p-6 ">
-      <div className="pt-4 ">
+    <div className="">
+      <div className="mx-10 mt-10">
         <h1 className="text-xl font-semibold">Suppliers</h1>
-        <p className="text-[#64748B] my-2">Manage your supplier relationship</p>
+        <p className="text-[#64748B] mb-6 mt-4">Manage your supplier relationship</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4 mt-6">
+      <div className="grid lg:grid-cols-3 gap-6 md:mx-10">
         {suppliersData.map((item) => (
           <div
             key={item.id}
@@ -69,7 +69,7 @@ const Suppliers = () => {
           </div>
         ))}
       </div>
-      <div className="bg-[#3B82F614] border border-[#3B82F6] mt-8 rounded-2xl ">
+      <div className="bg-[#3B82F614] border border-[#3B82F6] mt-6 md:mx-10 rounded-2xl">
         <div className="flex flex-col justify-center items-center py-16">
           <h1 className="font-bold text-2xl">Add New Supplier</h1>
           <p className="text-[#64748B] py-1 px-5">

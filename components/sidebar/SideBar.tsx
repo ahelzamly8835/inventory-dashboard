@@ -7,17 +7,27 @@ import { FiTruck } from "react-icons/fi";
 import { FiShoppingCart } from "react-icons/fi";
 import { GrAnalytics } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { NavLink, useNavigate } from "react-router-dom";
+import { supabase } from "../../src/lib/supabase";
 
 type Props = {
   open: boolean;
   setOpen: (val: boolean) => void;
 };
 const SideBar = ({ open, setOpen }: Props) => {
-  const handleLogout = () => {
-    toast.info("Logged out");
-  };
+const navigate = useNavigate();
+
+const handleLogout = async () => {
+  setOpen(false);
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    toast.error(error.message);
+    return;
+  }
+  toast.info("Logged out");
+  navigate("/");
+};
   return (
     <div
       className={`
@@ -32,68 +42,123 @@ const SideBar = ({ open, setOpen }: Props) => {
       </div>
       <div className="">
         <ul className="flex flex-col gap-4 mt-6">
-          <Link to="/dashboard" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <MdOutlineDashboard className="text-2xl" />
-              Dashboard
-            </li>
-          </Link>
-          <Link to="/products" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <LuBox className="text-2xl" />
-              Products
-            </li>
-          </Link>
-          <Link to="/alerts" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <GrCircleAlert className="text-2xl" />
-              Alerts{" "}
-              <span className="flex text-white bg-red-600/80 px-2 ml-auto rounded-full">
-                3
-              </span>
-            </li>
-          </Link>
-          <Link to="/reorder" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <IoReloadSharp className="text-2xl" />
-              Reorder
-            </li>
-          </Link>
-          <Link to="/suppliers" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <FiTruck className="text-2xl" />
-              Suppliers
-            </li>
-          </Link>
-          <Link to="/orders" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <FiShoppingCart className="text-2xl" />
-              Orders
-            </li>
-          </Link>
-          <Link to="/analytics" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <GrAnalytics className="text-2xl" />
-              Analytics
-            </li>
-          </Link>
-          <Link to="/settings" onClick={() => setOpen(false)}>
-            <li className="flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 hover:text-[#4F46E5] rounded-xl hover:bg-[#4F46E533] duration-150 ease-in-out">
-              <IoSettingsOutline className="text-2xl" />
-              Settings
-            </li>
-          </Link>
+          <NavLink to="/dashboard" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <MdOutlineDashboard className="text-2xl" />
+                Dashboard
+              </li>
+            )}
+          </NavLink>
+
+          <NavLink to="/products" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <LuBox className="text-2xl" />
+                Products
+              </li>
+            )}
+          </NavLink>
+
+          <NavLink to="/alerts" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <GrCircleAlert className="text-2xl" />
+                Alerts{" "}
+                <span className="flex text-white bg-red-600/80 px-2 ml-auto rounded-full">
+                  3
+                </span>
+              </li>
+            )}
+          </NavLink>
+          <NavLink to="/reorder" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <IoReloadSharp className="text-2xl" />
+                Reorder
+              </li>
+            )}
+          </NavLink>
+          <NavLink to="/suppliers" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <FiTruck className="text-2xl" />
+                Suppliers
+              </li>
+            )}
+          </NavLink>
+          <NavLink to="/orders" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <FiShoppingCart className="text-2xl" />
+                Orders
+              </li>
+            )}
+          </NavLink>
+          <NavLink to="/analytics" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <GrAnalytics className="text-2xl" />
+                Analytics
+              </li>
+            )}
+          </NavLink>
+          <NavLink to="/settings" onClick={() => setOpen(false)}>
+            {({ isActive }) => (
+              <li
+                className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
+                    ? "bg-[#4F46E533] text-[#4F46E5]"
+                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  }`}
+              >
+                <IoSettingsOutline className="text-2xl" />
+                Settings
+              </li>
+            )}
+          </NavLink>
         </ul>
       </div>
       <div className="btn mt-auto mb-4">
-        <Link to="/" onClick={() => setOpen(false)}>
           <button
             onClick={handleLogout}
-            className="bg-[#EEF2FF] cursor-pointer w-full py-2 font-semibold rounded-[10px] hover:bg-[#4F46E533] duration-150 ease-in-out"
-          >
+            className="bg-[#EEF2FF] cursor-pointer w-full py-2 font-semibold rounded-[10px] hover:bg-[#4F46E533] duration-150 ease-in-out">
             Logout
           </button>
-        </Link>
       </div>
     </div>
   );

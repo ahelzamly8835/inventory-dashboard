@@ -3,15 +3,15 @@ import { lowStockAlerts } from "../../src/dataAlerts/lowStockAlerts";
 
 export default function LowStockSection() {
   return (
-    <div className="mt-10 bg-white p-4 rounded-xl shadow flex flex-col gap-4">
+    <div className="mt-6 bg-white p-4 rounded-xl shadow flex flex-col gap-4 md:mx-10">
       <div className="flex justify-between items-center">
-        <h2 className="font-semibold">Low Stock Alerts</h2>
-        <button className="text-sm text-blue-600 flex items-center gap-1">
+        <h2 className="font-semibold md:p-6">Low Stock Alerts</h2>
+        <button className="text-sm flex items-center gap-2 cursor-pointer px-10">
           View All <span>→</span>
         </button>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 md:px-6">
         {lowStockAlerts.map((item: LowStockItem) => {
           const isCritical = item.status === "critical";
 
@@ -24,11 +24,10 @@ export default function LowStockSection() {
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm">{item.name}</p>
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      isCritical
+                    className={`text-xs px-2 py-0.5 rounded-full ${isCritical
                         ? "bg-red-100 text-red-600"
                         : "bg-yellow-100 text-yellow-600"
-                    }`}
+                      }`}
                   >
                     {isCritical ? "! Critical" : "! Low"}
                   </span>

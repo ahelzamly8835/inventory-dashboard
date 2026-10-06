@@ -35,10 +35,10 @@ const COLORS = ["#ef4444", "#facc15", "#22c55e"];
 
 const Analytics = () => {
   return (
-    <div className="p-4 sm:p-6 w-full">
-      <div className="mb-6">
+    <div className="md:mx-10">
+      <div className="mx-10 mt-10">
         <h1 className="text-xl sm:text-2xl font-semibold">Analytics</h1>
-        <p className="text-[#64748B] mt-2">
+        <p className="text-[#64748B] mb-6 mt-4">
           Insights into your inventory performance
         </p>
       </div>
@@ -47,7 +47,7 @@ const Analytics = () => {
         <TopBar data={inventoryStats} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 md:mx-10">
         <div className="p-4 sm:p-5 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <h1 className="text-lg sm:text-xl font-semibold py-2 mb-4">
             Inventory Value Trend
@@ -102,7 +102,7 @@ const Analytics = () => {
             Stock Status Breakdown
           </h1>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 h-full py-4">
-            <div className="w-[240px] h-[240px] sm:w-[280px] sm:h-[280px] relative">
+            <div className="w-60 h-60 sm:w-[280px] sm:h-[280px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -147,8 +147,8 @@ const Analytics = () => {
         </div>
       </div>
 
-      <div className="flex flex-col bg-white rounded-xl p-4 sm:p-5 mt-6 gap-4 shadow-sm border border-slate-100">
-        <h2 className="py-1 font-semibold text-lg">Key Insights</h2>
+      <div className="flex flex-col bg-white rounded-xl p-6  mt-6 md:mx-10 gap-6 shadow-sm border border-slate-100">
+        <h2 className="font-semibold text-lg">Key Insights</h2>
 
         <div className="flex items-start bg-[#3B82F61A] p-4 rounded-xl gap-3">
           <span className="text-xl text-[#3B82F6] mt-0.5 shrink-0">

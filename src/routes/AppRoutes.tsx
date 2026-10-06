@@ -9,13 +9,17 @@ import Suppliers from "../../pages/suppliers/Suppliers";
 import Orders from "../../pages/orders/Orders";
 import Analytics from "../../pages/analytics/Analytics";
 import Settings from "../../pages/settings/Settings";
-
+import ProtectedRoute from "../../components/ProtectedRoute";
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LogIn />} />
 
-      <Route element={<Layout />}>
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>}>
         <Route path="dashboard" element={<DashBoard />} />
         <Route path="products" element={<Products />} />
         <Route path="alerts" element={<Alerts />} />

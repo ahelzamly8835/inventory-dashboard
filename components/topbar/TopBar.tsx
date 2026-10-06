@@ -6,7 +6,7 @@ type Props = {
 
 export default function TopBar({ data }: Props) {
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 md:px-10">
       {data.map((item) => {
         const Icon = item.icon;
 

@@ -1,3 +1,4 @@
+import { GrCircleAlert } from "react-icons/gr";
 type AlertStatus = "critical" | "low";
 
 type ActionItem = {
@@ -12,6 +13,7 @@ type AlertItem = {
   status: AlertStatus;
   message: string;
   actions: ActionItem[];
+  read?: boolean;
 };
 
 const alertsData: AlertItem[] = [
@@ -62,6 +64,7 @@ const alertsData: AlertItem[] = [
       { label: "Reorder", type: "secondary" },
       { label: "Mark as read", type: "danger" },
     ],
+    read: true,
   },
 ];
 
@@ -75,36 +78,42 @@ const btnStyles = {
 
 const Alerts = () => {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="pt-10 pl-10 ">
+    <div className="md:mx-10 mt-8">
+      <div className="mx-4 md:mx-0 flex justify-between items-center">
         <h1 className="text-xl font-semibold">Stock Alerts</h1>
-        <p className="text-[#64748B] my-4">3 unread alerts</p>
+        <button className="border border-[#E5E7EB] p-3 rounded-xl cursor-pointer font-semibold">Mark All as Read</button>
       </div>
-
-      <div className="flex flex-col gap-4">
+      <p className="text-[#64748B] mt-4 mb-6 mx-4 md:mx-0">3 unread alerts</p>
+      <div className="flex flex-col gap-6">
         {alertsData.map((item) => (
           <div
             key={item.id}
-            className="bg-white p-5 rounded-xl shadow hover:shadow-md transition flex flex-col gap-3"
+            className={`py-6 px-10 rounded-xl shadow transition flex flex-col gap-3 ${item.read
+                ? "bg-gray-100 opacity-60 pointer-events-none"
+                : "bg-white hover:shadow-md"
+              }`}
           >
             <div className="flex justify-between items-center">
-              <h2 className="font-medium">{item.title}</h2>
+              <div className="flex items-center gap-2">
+                <GrCircleAlert className="text-[#EF4444] text-xl" />
+                <h2 className="font-medium">
+                  {item.title}</h2>
+              </div>
               <p className="text-xs text-gray-400">{item.time}</p>
             </div>
 
             <span
-              className={`text-xs px-2 py-1 rounded-full w-fit ${
-                item.status === "critical"
+              className={`text-xs ml-6 px-2 py-1 rounded-full w-fit ${item.status === "critical"
                   ? "bg-red-100 text-red-600"
                   : "bg-yellow-100 text-yellow-600"
-              }`}
+                }`}
             >
               {item.status === "critical" ? "Critical Stock" : "Low Stock"}
             </span>
 
-            <p className="text-sm text-gray-500">{item.message}</p>
+            <p className="text-sm ml-6 text-gray-500">{item.message}</p>
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3 ml-6 flex-wrap">
               {item.actions.map((action, i) => (
                 <button
                   key={i}
