@@ -4,6 +4,13 @@
 
 An inventory dashboard built with React 19, TypeScript and Tailwind, connected to a real authenticated backend (Supabase).
 
+
+## Live demo
+
+https://inventory-dashboard-brown.vercel.app
+
+Demo account: `test@example.com` / `123456`
+
 ## Features
 
 - Email/password authentication, with protected routes
