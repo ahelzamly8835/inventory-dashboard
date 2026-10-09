@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# ReStock — Inventory Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![CI](https://github.com/ahelzamly8835/inventory-dashboard/actions/workflows/ci.yml/badge.svg)
 
-Currently, two official plugins are available:
+An inventory dashboard built with React 19, TypeScript and Tailwind, connected to a real authenticated backend (Supabase).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Email/password authentication, with protected routes
+- Products: list, add, edit, delete
+- Server-side search by name or SKU (debounced)
+- Status (healthy / low / critical) derived from stock levels
+- Loading, error and empty states
+- Automated tests, run on every push by GitHub Actions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+React 19, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query, Supabase (Postgres + Auth), Vitest, React Testing Library
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Design decisions
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Security lives in the database.** Row Level Security is enabled on `products`, with a policy that lets a user read and write only the rows where `user_id = auth.uid()`. The publishable key in the frontend is public by design; RLS is what protects the data. `user_id` is filled by the database from the session, never sent by the client.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Server state is managed by TanStack Query.** Queries use the key `["products", search]`, so each search term has its own cache entry. After every mutation I call `invalidateQueries({ queryKey: ["products"] })`, which refreshes all of them.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Optimistic delete with rollback.** Deleting a product removes it from the cache immediately. If the request fails, the previous cache snapshot is restored and an error toast is shown. The list is refetched on settle so it always matches the database.
+
+**Search runs on the server.** The query uses `ilike` on name and SKU with a 400 ms debounce, so typing doesn't fire a request per keystroke. The status filter stays on the client because status is computed from stock levels, not stored in the table.
+
+**Status is derived, not stored.** Storing it would let it drift from the stock numbers after an edit.
+
+## Testing
+
+```bash
+npm test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- `getStatus`: boundary cases of the status rule
+- `ConfirmModal`: rendering, confirm/cancel, disabled while loading
+- `Products` page: loading, error, empty and populated states
+- `LogIn`: sends credentials to Supabase, shows an error on failure, navigates on success
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Supabase is mocked in the tests, so they run without a network or a database.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting started
+
+```bash
+npm install
 ```
+
+Create `.env.local`:
+
+```
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+Create the table in the Supabase SQL editor:
+
+```sql
+create table products (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id),
+  sku text not null,
+  name text not null,
+  category text,
+  current_stock int not null default 0,
+  min_stock int not null default 0,
+  max_stock int not null default 100,
+  price numeric(10,2) not null default 0,
+  created_at timestamptz default now()
+);
+
+alter table products enable row level security;
+
+create policy "users manage own products" on products
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+```
+
+Then `npm run dev`.
+
+## Known limitations
+
+- Only delete is optimistic; add and edit refresh after the server responds.
+- Only the Products page is connected to the database. The other pages still use static data.
+- The category filter options are hardcoded.
