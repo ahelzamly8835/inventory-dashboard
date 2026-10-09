@@ -6,6 +6,9 @@ import {
 } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
+
+
+
 export type Status = "healthy" | "low" | "critical";
 
 export interface Product {
@@ -22,7 +25,7 @@ export interface Product {
 
 export type NewProduct = Omit<Product, "id" | "status">;
 
-function getStatus(current: number, min: number): Status {
+export function getStatus(current: number, min: number): Status {
   if (current < min) return "critical";
   if (current <= min * 1.5) return "low";
   return "healthy";
