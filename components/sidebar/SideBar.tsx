@@ -10,24 +10,27 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "../../src/lib/supabase";
-
+import { useProducts } from "../../src/hooks/useProducts";
 type Props = {
   open: boolean;
   setOpen: (val: boolean) => void;
 };
 const SideBar = ({ open, setOpen }: Props) => {
-const navigate = useNavigate();
-
-const handleLogout = async () => {
-  setOpen(false);
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    toast.error(error.message);
-    return;
-  }
-  toast.info("Logged out");
-  navigate("/");
-};
+  const navigate = useNavigate();
+  const { data: products = [] } = useProducts();
+  const alertCount = products.filter(
+    (p) => p.status === "low" || p.status === "critical",
+  ).length;
+  const handleLogout = async () => {
+    setOpen(false);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.info("Logged out");
+    navigate("/");
+  };
   return (
     <div
       className={`
@@ -46,8 +49,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <MdOutlineDashboard className="text-2xl" />
@@ -60,8 +63,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <LuBox className="text-2xl" />
@@ -74,15 +77,17 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <GrCircleAlert className="text-2xl" />
                 Alerts{" "}
-                <span className="flex text-white bg-red-600/80 px-2 ml-auto rounded-full">
-                  3
-                </span>
+                {alertCount > 0 && (
+                  <span className="flex text-white bg-red-600/80 px-2 ml-auto rounded-full">
+                    {alertCount}
+                  </span>
+                )}
               </li>
             )}
           </NavLink>
@@ -90,8 +95,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <IoReloadSharp className="text-2xl" />
@@ -103,8 +108,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <FiTruck className="text-2xl" />
@@ -116,8 +121,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <FiShoppingCart className="text-2xl" />
@@ -129,8 +134,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <GrAnalytics className="text-2xl" />
@@ -142,8 +147,8 @@ const handleLogout = async () => {
             {({ isActive }) => (
               <li
                 className={`flex items-center gap-1 font-semibold cursor-pointer py-3 px-2 rounded-xl duration-150 ease-in-out ${isActive
-                    ? "bg-[#4F46E533] text-[#4F46E5]"
-                    : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
+                  ? "bg-[#4F46E533] text-[#4F46E5]"
+                  : "hover:bg-[#4F46E533] hover:text-[#4F46E5]"
                   }`}
               >
                 <IoSettingsOutline className="text-2xl" />
@@ -154,11 +159,11 @@ const handleLogout = async () => {
         </ul>
       </div>
       <div className="btn mt-auto mb-4">
-          <button
-            onClick={handleLogout}
-            className="bg-[#EEF2FF] cursor-pointer w-full py-2 font-semibold rounded-[10px] hover:bg-[#4F46E533] duration-150 ease-in-out">
-            Logout
-          </button>
+        <button
+          onClick={handleLogout}
+          className="bg-[#EEF2FF] cursor-pointer w-full py-2 font-semibold rounded-[10px] hover:bg-[#4F46E533] duration-150 ease-in-out">
+          Logout
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import TopBar from "../../components/topbar/TopBar";
 import { inventoryStats } from "../../src/data/stats";
+import { useProducts } from "../../src/hooks/useProducts";
 import { FaRegLightbulb } from "react-icons/fa";
 import { TbInfoTriangle } from "react-icons/tb";
 import { IoIosCheckboxOutline } from "react-icons/io";
@@ -16,6 +17,7 @@ import {
 } from "recharts";
 import { PieChart, Pie, Cell, LabelList } from "recharts";
 
+// Sample data: the database keeps no history, so this trend can't be real yet.
 const data = [
   { name: "Jan", uv: 500, amt: 2400 },
   { name: "Feb", uv: 550, amt: 2210 },
@@ -25,15 +27,64 @@ const data = [
   { name: "Jun", uv: 550, amt: 2500 },
 ];
 
-const dataTow = [
-  { name: "Critical", value: 15 },
-  { name: "Low Stock", value: 35 },
-  { name: "Healthy", value: 50 },
-];
-
-const COLORS = ["#ef4444", "#facc15", "#22c55e"];
+const money = (n: number) =>
+  `$${n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 const Analytics = () => {
+  const { data: products = [], isLoading } = useProducts();
+
+  const total = products.length;
+  const critical = products.filter((p) => p.status === "critical").length;
+  const low = products.filter((p) => p.status === "low").length;
+  const healthy = products.filter((p) => p.status === "healthy").length;
+  const alerts = critical + low;
+
+  const stockValue = products.reduce(
+    (sum, p) => sum + p.price * p.currentStock,
+    0,
+  );
+
+  const avgStockLevel = total
+    ? (products.reduce(
+        (sum, p) => sum + (p.maxStock ? p.currentStock / p.maxStock : 0),
+        0,
+      ) /
+        total) *
+      100
+    : 0;
+
+  const stats = inventoryStats.map((s) => {
+    if (s.id === 1) {
+      return { ...s, value: money(stockValue), subText: "Current stock value" };
+    }
+    if (s.id === 2) {
+      return {
+        ...s,
+        value: `${avgStockLevel.toFixed(1)}%`,
+        subText: "Of max capacity",
+      };
+    }
+    if (s.id === 3) {
+      return { ...s, value: total };
+    }
+    return { ...s, value: alerts };
+  });
+
+  const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
+
+  const pieData = [
+    { name: "Critical", value: pct(critical), color: "#ef4444" },
+    { name: "Low Stock", value: pct(low), color: "#facc15" },
+    { name: "Healthy", value: pct(healthy), color: "#22c55e" },
+  ].filter((d) => d.value > 0);
+
+  if (isLoading) {
+    return <p className="text-center text-gray-400 mt-10">Loading...</p>;
+  }
+
   return (
     <div className="md:mx-10">
       <div className="mx-10 mt-10">
@@ -44,13 +95,16 @@ const Analytics = () => {
       </div>
 
       <div className="w-full overflow-x-auto">
-        <TopBar data={inventoryStats} />
+        <TopBar data={stats} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 md:mx-10">
         <div className="p-4 sm:p-5 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col">
           <h1 className="text-lg sm:text-xl font-semibold py-2 mb-4">
             Inventory Value Trend
+            <span className="text-xs font-normal text-slate-400 ml-2">
+              sample data
+            </span>
           </h1>
           <div className="w-full h-[300px] sm:h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -106,15 +160,15 @@ const Analytics = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={dataTow}
+                    data={pieData}
                     dataKey="value"
                     cy="50%"
                     cx="50%"
                     innerRadius="60%"
                     outerRadius="90%"
                   >
-                    {dataTow.map((_, index) => (
-                      <Cell key={index} fill={COLORS[index]} />
+                    {pieData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
                     ))}
                     <LabelList
                       dataKey="value"
@@ -155,11 +209,9 @@ const Analytics = () => {
             <FaRegLightbulb />
           </span>
           <div>
-            <h3 className="text-[#3B82F6] font-medium mb-1">
-              Inventory growing
-            </h3>
+            <h3 className="text-[#3B82F6] font-medium mb-1">Inventory value</h3>
             <p className="text-[#3B82F6] text-sm opacity-90">
-              Your total inventory value has increased by 12.5% this month.
+              Your stock is worth {money(stockValue)} across {total} products.
               Consider optimizing reorder quantities to avoid overstocking.
             </p>
           </div>
@@ -172,8 +224,11 @@ const Analytics = () => {
           <div>
             <h3 className="text-[#F59E0B] font-medium mb-1">Low Stock Items</h3>
             <p className="text-[#F59E0B] text-sm opacity-90">
-              You have 4 products below optimal stock levels. Review these items
-              to prevent stockouts.
+              {alerts === 0
+                ? "No products are below optimal stock levels."
+                : `You have ${alerts} ${
+                    alerts === 1 ? "product" : "products"
+                  } below optimal stock levels. Review these items to prevent stockouts.`}
             </p>
           </div>
         </div>
@@ -184,11 +239,10 @@ const Analytics = () => {
           </span>
           <div>
             <h3 className="text-[#22C55E] font-medium mb-1">
-              Inventory Healthy
+              Healthy inventory
             </h3>
             <p className="text-[#22C55E] text-sm opacity-90">
-              Your turnover rate is stable. Fast-moving items are tracking
-              correctly according to demand predictions.
+              {healthy} of {total} products are at healthy stock levels.
             </p>
           </div>
         </div>

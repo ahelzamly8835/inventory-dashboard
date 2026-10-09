@@ -19,6 +19,7 @@ Demo account: `test@example.com` / `123456`
 - Status (healthy / low / critical) derived from stock levels
 - Loading, error and empty states
 - Automated tests, run on every push by GitHub Actions
+- Dashboard, Analytics and Alerts computed from live product data
 
 ## Stack
 
@@ -91,5 +92,8 @@ Then `npm run dev`.
 ## Known limitations
 
 - Only delete is optimistic; add and edit refresh after the server responds.
-- Only the Products page is connected to the database. The other pages still use static data.
+- Dashboard, Analytics, Alerts and the sidebar alert badge are computed from the products table. Orders, Suppliers, Reorder and Settings still use static data.
+- The Inventory Value Trend chart uses sample data, because the database keeps no history.
+- Alert read/unread state and reorder actions are not implemented.
 - The category filter options are hardcoded.
+- Tests cover the login page, the Products page states, the confirm dialog and the status rule. Mutations and the delete rollback are not covered yet.

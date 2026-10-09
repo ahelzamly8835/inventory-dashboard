@@ -1,10 +1,58 @@
 import TopBar from "../../components/topbar/TopBar";
 import { dashboardStats } from "../../src/data/stats";
+import {
+  useProducts,
+  type Status,
+} from "../../src/hooks/useProducts";
 import LowStockSection from "../../components/LowStockSection/LowStockSection";
 import { LuBox } from "react-icons/lu";
 import { GrAnalytics } from "react-icons/gr";
 import { GrCircleAlert } from "react-icons/gr";
+
 const DashBoard = () => {
+  const { data: products = [], isLoading } = useProducts();
+
+  const count = (status: Status) =>
+    products.filter((p) => p.status === status).length;
+
+  const stockValue = products.reduce(
+    (sum, p) => sum + p.price * p.currentStock,
+    0,
+  );
+
+  const stats = dashboardStats
+    .filter((s) => s.id !== 4)
+    .map((s) => {
+      if (s.id === 1) {
+        return {
+          ...s,
+          value: products.length,
+          subItems: [
+            { label: "healthy", value: count("healthy"), type: "success" as const },
+            { label: "low", value: count("low"), type: "warning" as const },
+            { label: "critical", value: count("critical"), type: "danger" as const },
+          ],
+        };
+      }
+      if (s.id === 2) {
+        return {
+          ...s,
+          value: `$${stockValue.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+        };
+      }
+      if (s.id === 3) {
+        return { ...s, value: count("low") + count("critical") };
+      }
+      return s;
+    });
+
+  if (isLoading) {
+    return <p className="text-center text-gray-400 mt-10">Loading...</p>;
+  }
+
   return (
     <div>
       <div className="pt-14 pl-10">
@@ -13,7 +61,7 @@ const DashBoard = () => {
           Welcome back, Omar! Here’s your inventory overview.
         </p>
       </div>
-      <TopBar data={dashboardStats} />
+      <TopBar data={stats} />
       <div className="">
         <LowStockSection />
       </div>
