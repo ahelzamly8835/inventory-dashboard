@@ -58,7 +58,7 @@ const DashBoard = () => {
       <div className="pt-14 pl-10">
         <h1 className="text-xl font-semibold">Dashboard</h1>
         <p className="text-[#64748B] mt-4 mb-6">
-          Welcome back, Omar! Here’s your inventory overview.
+          Welcome back, Ahmed! Here’s your inventory overview.
         </p>
       </div>
       <TopBar data={stats} />

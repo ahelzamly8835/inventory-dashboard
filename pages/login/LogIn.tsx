@@ -47,7 +47,7 @@ export default function LogIn() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Omar@example.com"
+            placeholder="test@example.com"
             className="w-full px-4 py-3 rounded-xl focus:bg-white border border-[#E5E7EB] outline-none"
           />
           <label className="block  text-sm text-gray-700 mt-4 mb-1">
